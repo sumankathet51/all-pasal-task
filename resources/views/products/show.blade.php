@@ -66,16 +66,17 @@
         const variantSelectElement = document.getElementById('variant');
         const cachedConfigurations = {}
         async function fetchConfigurations() {
-            if (cachedConfigurations.hasOwnProperty(`${variantSelectElement.value}`)) {
-                updateConfigurationToDOM(cachedConfigurations[variantSelectElement.value])
-                return
-            }
+
             var url = ''
             if (!variantSelectElement) {
                 url = `/product/{{ $product->product_code }}`;
             } else {
                 const variantCode = variantSelectElement.value
                 url = `/variant/${variantCode}`;
+                if (cachedConfigurations.hasOwnProperty(`${variantCode}`)) {
+                    updateConfigurationToDOM(cachedConfigurations[variantSelectElement.value])
+                    return
+                }
             }
 
             try{
