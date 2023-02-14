@@ -64,9 +64,13 @@
 @section('scripts')
     <script>
         const variantSelectElement = document.getElementById('variant');
-
+        const cachedConfigurations = {}
         async function fetchConfigurations() {
-            let url = ''
+            if (cachedConfigurations.hasOwnProperty(`${variantSelectElement.value}`)) {
+                updateConfigurationToDOM(cachedConfigurations[variantSelectElement.value])
+                return
+            }
+            var url = ''
             if (!variantSelectElement) {
                 url = `/product/{{ $product->product_code }}`;
             } else {
@@ -74,38 +78,24 @@
                 url = `/variant/${variantCode}`;
             }
 
-            const parentDiv = document.getElementById('configurations');
-
-            while (parentDiv.firstChild) {
-                parentDiv.removeChild(parentDiv.lastChild);
-            }
-
             try{
                 setLoading();
                 const response = await fetch(url)
                 if(response.status === 200) {
                     let configurations = JSON.parse(await response.text()).data ;
-
-                    configurations.forEach((configuration) => {
-                        const divElement = document.createElement('div');
-                        divElement.classList.add('flex')
-                        divElement.classList.add( 'justify-between' )
-                        divElement.classList.add('items-center')
-                        const variantName = document.createElement('p');
-                        variantName.classList.add('text-xl')
-                        variantName.innerText = configuration.code
-
-                        const variantConfig = document.createElement('p');
-                        variantConfig.classList.add('text-xl')
-                        variantConfig.innerText = `${configuration.value? configuration.value: '1'} ${configuration.name}`
-
-                        divElement.appendChild(variantName)
-                        divElement.appendChild(variantConfig)
-
-                        parentDiv.appendChild(divElement)
-                    })
+                    updateConfigurationToDOM(configurations)
+                    if (variantSelectElement){
+                        const variantCode = variantSelectElement.value;
+                        cachedConfigurations[variantCode] = configurations
+                        console.log(cachedConfigurations)
+                    }
                 }
             } catch (e) {
+                const parentDiv = document.getElementById('configurations');
+
+                while (parentDiv.firstChild) {
+                    parentDiv.removeChild(parentDiv.lastChild);
+                }
                 const paragraph = document.createElement('p');
                 paragraph.classList.add('text-xl')
                 paragraph.innerText = 'An error occurred!'
@@ -133,6 +123,33 @@
                     loadingElement.classList.remove('flex')
                 loadingElement.classList.add('hidden')
             }
+        }
+
+        function updateConfigurationToDOM(configurations) {
+            const parentDiv = document.getElementById('configurations');
+
+            while (parentDiv.firstChild) {
+                parentDiv.removeChild(parentDiv.lastChild);
+            }
+            configurations.forEach((configuration) => {
+                const divElement = document.createElement('div');
+                divElement.classList.add('flex')
+                divElement.classList.add( 'justify-between' )
+                divElement.classList.add('items-center')
+                const variantName = document.createElement('p');
+                variantName.classList.add('text-xl')
+                variantName.innerText = configuration.code
+
+                const variantConfig = document.createElement('p');
+                variantConfig.classList.add('text-xl')
+                variantConfig.innerText = `${configuration.value? configuration.value: '1'} ${configuration.name}`
+
+                divElement.appendChild(variantName)
+                divElement.appendChild(variantConfig)
+
+                parentDiv.appendChild(divElement)
+            })
+
         }
 
         window.addEventListener('load', fetchConfigurations)
