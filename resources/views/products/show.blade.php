@@ -64,9 +64,16 @@
 @section('scripts')
     <script>
         const variantSelectElement = document.getElementById('variant');
+        var parentDiv = document.getElementById('configurations');
+
+        while (parentDiv.firstChild) {
+            parentDiv.removeChild(parentDiv.lastChild);
+        }
         const cachedConfigurations = {}
         async function fetchConfigurations() {
-
+            while (parentDiv.firstChild) {
+                parentDiv.removeChild(parentDiv.lastChild);
+            }
             var url = ''
             if (!variantSelectElement) {
                 url = `/product/{{ $product->product_code }}`;
@@ -88,12 +95,9 @@
                     if (variantSelectElement){
                         const variantCode = variantSelectElement.value;
                         cachedConfigurations[variantCode] = configurations
-                        console.log(cachedConfigurations)
                     }
                 }
             } catch (e) {
-                const parentDiv = document.getElementById('configurations');
-
                 while (parentDiv.firstChild) {
                     parentDiv.removeChild(parentDiv.lastChild);
                 }
@@ -127,11 +131,7 @@
         }
 
         function updateConfigurationToDOM(configurations) {
-            const parentDiv = document.getElementById('configurations');
 
-            while (parentDiv.firstChild) {
-                parentDiv.removeChild(parentDiv.lastChild);
-            }
             configurations.forEach((configuration) => {
                 const divElement = document.createElement('div');
                 divElement.classList.add('flex')
