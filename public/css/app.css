@@ -657,6 +657,10 @@ video {
 .w-full {
   width: 100%;
 }
+.w-max {
+  width: -moz-max-content;
+  width: max-content;
+}
 .max-w-6xl {
   max-width: 72rem;
 }
@@ -1179,6 +1183,16 @@ video {
 
   .lg\:pl-10 {
     padding-left: 2.5rem;
+  }
+}
+@media (min-width: 1280px) {
+
+  .xl\:ml-5 {
+    margin-left: 1.25rem;
+  }
+
+  .xl\:ml-10 {
+    margin-left: 2.5rem;
   }
 }
 
